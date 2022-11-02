@@ -1,0 +1,75 @@
+Filters:
+MIME whitelist (image/jpeg) server side
+extension whitelist (jpg, jpeg) client side
+magic number whitelist (ÿØÿ) client side
+size filter (~51kb) client side
+
+Accepted file formats:
+.jpeg with magic jpeg FF D8 FF DB
+ 
+
+Refused file formats:
+.jpeg.php
+.php -> .jpeg
+.php with magic jpeg FF D8 FF DB
+
+use /admin to execute our js shell. Can be sent as a jpeg then found with gobuster and executed via the admin page
+
+Methodology:
+
+Recon:
+
+Walk the site
+    - Wappalyzer browser extension (not always reliable!) (acc gweil0@protonmail.com ZNhGnTLX2W8qP46)
+        found:
+            - web frameworks: Express
+            - web servers: Express, Nginx v1.14.0
+            - Programming languages: Node.js
+            - OS: Ubuntu
+            - JS libraries: jQuery 3.5.1
+            - Reverse proxies: Nginx v1.14.0
+    
+    - Inspect upload page source code
+        found:
+            - file size:
+                - size must be < 50 * 8* 1024 (50kb?)
+            - magic number:
+                - must be "ÿØÿ" (jpg raw)
+            - extension:
+                - splits on . and takes split[1] as the extension
+                - extension filter (.jpg/.jpeg)
+
+
+    - Burp suite/ZAProxy request interception
+        found:
+        Images stored in /content/ABC.jpg -> renamed on upload
+
+        Captured web requests:
+            Main page:
+                HTTP/1.1 304 Not Modified
+                Server: nginx/1.14.0 (Ubuntu)
+                Date: Sat, 08 Oct 2022 11:22:12 GMT
+                Connection: close
+                X-Powered-By: Express
+                Access-Control-Allow-Origin: *
+                Accept-Ranges: bytes
+                Cache-Control: public, max-age=0
+                Last-Modified: Fri, 03 Jul 2020 20:57:40 GMT
+                ETag: W/"5ea-173167875a0"
+                Front-End-Https: on
+
+            Upload jpeg success:
+                HTTP/1.1 200 OK
+                Server: nginx/1.14.0 (Ubuntu)
+                Date: Sat, 08 Oct 2022 11:24:59 GMT
+                Content-Type: text/html; charset=utf-8
+                Content-Length: 7
+                Connection: close
+                X-Powered-By: Express
+                Access-Control-Allow-Origin: *
+                ETag: W/"7-U6VofLJtxB8qtAM+l+E63v03QNY"
+                Front-End-Https: on
+
+                success
+
+    

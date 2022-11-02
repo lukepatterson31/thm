@@ -1,0 +1,8 @@
+cant use cat, echo etc..
+
+while read line; do echo $line; done < FILE_NAME
+grep PATTERN_HERE (. pattern to search for anything) FILE_NAME
+grep -R . -> recursively displays all file contents
+
+check root access:
+sudo -l
