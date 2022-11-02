@@ -237,3 +237,65 @@ This separation of command information and data into separate channels is a way 
 More Details:
 
 You can find more details on the technical function, and implementation of, FTP on the Internet Engineering Task Force website: https://www.ietf.org/rfc/rfc959.txt. The IETF is one of a number of standards agencies, who define and regulate internet standards.
+
+## Enumerating FTP
+
+First scan found only the FTP port but the answer to the first question isn't one so ran a scond scan
+```
+nmap -sT -sV -p- 10.10.30.162
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-02 16:47 GMT
+Nmap scan report for 10.10.30.162
+Host is up (0.0099s latency).
+Not shown: 65534 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 2.0.8 or later
+Service Info: Host: Welcome
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 20.56 seconds
+```
+
+Second scan revealed anonymous access was possible but no other ports
+```
+nmap -sC -sV -p- 10.10.30.162
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-02 16:48 GMT
+Nmap scan report for 10.10.30.162
+Host is up (0.011s latency).
+Not shown: 65534 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 2.0.8 or later
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to ::ffff:10.11.7.163
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 2
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_-rw-r--r--    1 0        0             353 Apr 24  2020 PUBLIC_NOTICE.txt
+Service Info: Host: Welcome
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.80 seconds
+```
+Third scan reveals the http port
+```
+nmap -Pn0-9999 10.10.30.162
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-02 16:54 GMT
+Nmap scan report for 10.10.30.162
+Host is up (0.040s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT   STATE SERVICE
+21/tcp open  ftp
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 0.63 seconds
+```
+
+
