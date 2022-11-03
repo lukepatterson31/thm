@@ -240,7 +240,7 @@ You can find more details on the technical function, and implementation of, FTP 
 
 ## Enumerating FTP
 
-First scan found only the FTP port but the answer to the first question isn't one so ran a scond scan
+First scan found only the FTP port but the answer to the first question (how many open ports) isn't one so ran a second scan
 ```
 nmap -sT -sV -p- 10.10.30.162
 Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-02 16:47 GMT
@@ -298,4 +298,9 @@ PORT   STATE SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 0.63 seconds
 ```
 
+Connected with ftp anonymous and found potential admin username in txt file
 
+## Exploiting FTP
+
+Using hydra and the username found in the txt file we get credentials to access the ftp (mike : password) and get the flag 
+THM{y0u_g0t_th3_ftp_fl4g}
