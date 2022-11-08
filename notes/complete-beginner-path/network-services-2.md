@@ -191,3 +191,153 @@ Can we execute bash as root(./bash -p)? yes
 
 Flag? THM{nfs_got_pwned}
 
+## SMTP
+
+What is SMTP?
+
+SMTP stands for "Simple Mail Transfer Protocol". It is utilised to handle the sending of emails. In order to support email services, a protocol pair is required, comprising of SMTP and POP/IMAP. Together they allow the user to send outgoing mail and retrieve incoming mail, respectively.
+
+The SMTP server performs three basic functions:
+
+     It verifies who is sending emails through the SMTP server.
+     It sends the outgoing mail
+     If the outgoing mail can't be delivered it sends the message back to the sender
+
+Most people will have encountered SMTP when configuring a new email address on some third-party email clients, such as Thunderbird; as when you configure a new email client, you will need to configure the SMTP server configuration in order to send outgoing emails.
+
+POP and IMAP
+
+POP, or "Post Office Protocol" and IMAP, "Internet Message Access Protocol" are both email protocols who are responsible for the transfer of email between a client and a mail server. The main differences is in POP's more simplistic approach of downloading the inbox from the mail server, to the client. Where IMAP will synchronise the current inbox, with new mail on the server, downloading anything new. This means that changes to the inbox made on one computer, over IMAP, will persist if you then synchronise the inbox from another computer. The POP/IMAP server is responsible for fulfiling this process.
+
+How does SMTP work?
+
+Email delivery functions much the same as the physical mail delivery system. The user will supply the email (a letter) and a service (the postal delivery service), and through a series of steps- will deliver it to the recipients inbox (postbox). The role of the SMTP server in this service, is to act as the sorting office, the email (letter) is picked up and sent to this server, which then directs it to the recipient.
+
+We can map the journey of an email from your computer to the recipient’s like this:
+
+```
+User ---> SMTP Server ---> The Wider Internet
+                                    /
+Recipient <--- POP/IMAP Server   <-- 
+```
+
+1. The mail user agent, which is either your email client or an external program. connects to the SMTP server of your domain, e.g. smtp.google.com. This initiates the SMTP handshake. This connection works over the SMTP port- which is usually 25. Once these connections have been made and validated, the SMTP session starts.
+
+2. The process of sending mail can now begin. The client first submits the sender, and recipient's email address- the body of the email and any attachments, to the server.
+
+3. The SMTP server then checks whether the domain name of the recipient and the sender is the same.
+
+4. The SMTP server of the sender will make a connection to the recipient's SMTP server before relaying the email. If the recipient's server can't be accessed, or is not available- the Email gets put into an SMTP queue.
+
+5. Then, the recipient's SMTP server will verify the incoming email. It does this by checking if the domain and user name have been recognised. The server will then forward the email to the POP or IMAP server, as shown in the diagram above.
+
+6. The E-Mail will then show up in the recipient's inbox.
+
+This is a very simplified version of the process, and there are a lot of sub-protocols, communications and details that haven't been included. If you're looking to learn more about this topic, this is a really friendly to read breakdown of the finer technical details- I actually used it to write this breakdown:
+
+https://computer.howstuffworks.com/e-mail-messaging/email3.htm
+
+What runs SMTP?
+
+SMTP Server software is readily available on Windows server platforms, with many other variants of SMTP being available to run on Linux.
+
+More Information:
+
+Here is a resource that explain the technical implementation, and working of, SMTP in more detail than I have covered here.
+
+https://www.afternerd.com/blog/smtp/
+
+### Enumerating SMTP
+
+Enumerating Server Details
+
+Poorly configured or vulnerable mail servers can often provide an initial foothold into a network, but prior to launching an attack, we want to fingerprint the server to make our targeting as precise as possible. We're going to use the "smtp_version" module in MetaSploit to do this. As its name implies, it will scan a range of IP addresses and determine the version of any mail servers it encounters.
+
+Enumerating Users from SMTP
+
+The SMTP service has two internal commands that allow the enumeration of users: VRFY (confirming the names of valid users) and EXPN (which reveals the actual address of user’s aliases and lists of e-mail (mailing lists). Using these SMTP commands, we can reveal a list of valid users
+
+We can do this manually, over a telnet connection- however Metasploit comes to the rescue again, providing a handy module appropriately called "smtp_enum" that will do the legwork for us! Using the module is a simple matter of feeding it a host or range of hosts to scan and a wordlist containing usernames to enumerate.
+Requirements
+
+As we're going to be using Metasploit for this, it's important that you have Metasploit installed. It is by default on both Kali Linux and Parrot OS; however, it's always worth doing a quick update to make sure that you're on the latest version before launching any attacks. You can do this with a simple "sudo apt update", and accompanying upgrade- if any are required.
+
+Alternatives
+
+It's worth noting that this enumeration technique will work for the majority of SMTP configurations; however there are other, non-metasploit tools such as smtp-user-enum that work even better for enumerating OS-level user accounts on Solaris via the SMTP service. Enumeration is performed by inspecting the responses to VRFY, EXPN, and RCPT TO commands.
+
+This technique could be adapted in future to work against other vulnerable SMTP daemons, but this hasn’t been done as of the time of writing. It's an alternative that's worth keeping in mind if you're trying to distance yourself from using Metasploit e.g. in preparation for OSCP.
+
+nmap scan on target:
+```
+# Nmap 7.93 scan initiated Tue Nov  8 09:03:34 2022 as: nmap -sT -A -p- -oN thm/notes/complete-beginner-path/smtp-scan 10.10.240.81
+Nmap scan report for 10.10.240.81
+Host is up (0.014s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 62a7031339085a07801ae527ee9b225d (RSA)
+|   256 89d0409215093970176ec5de5b59eecb (ECDSA)
+|_  256 567cd0c4952b77dd53d6e6739924f686 (ED25519)
+25/tcp open  smtp    Postfix smtpd
+|_ssl-date: TLS randomness does not represent time
+|_smtp-commands: polosmtp.home, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8
+| ssl-cert: Subject: commonName=polosmtp
+| Subject Alternative Name: DNS:polosmtp
+| Not valid before: 2020-04-22T18:38:06
+|_Not valid after:  2030-04-20T18:38:06
+Service Info: Host:  polosmtp.home; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Nov  8 09:03:46 2022 -- 1 IP address (1 host up) scanned in 11.81 seconds
+```
+
+started Metasploit and used `auxiliary/scanner/smtp/smtp_version` against the target and found the system's mail name: `polosmtp.home`
+```
+[+] 10.10.240.81:25       - 10.10.240.81:25 SMTP 220 polosmtp.home ESMTP Postfix (Ubuntu)\x0d\x0a
+[*] 10.10.240.81:25       - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+```
+
+found the MTA running the SMTP server (`telnet <TARGET-IP> <SMTP-PORT>`): Postfix
+```
+Trying 10.10.240.81...
+Connected to 10.10.240.81.
+Escape character is '^]'.
+220 polosmtp.home ESMTP Postfix (Ubuntu)
+```
+
+used `auxiliary/scanner/smtp/smtp_enum` against target and found the user `administrator`
+```
+*] 10.10.240.81:25       - 10.10.240.81:25 Banner: 220 polosmtp.home ESMTP Postfix (Ubuntu)
+[+] 10.10.240.81:25       - 10.10.240.81:25 Users found: administrator
+[*] 10.10.240.81:25       - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+```
+
+Questions:
+
+What port is SMTP running on?
+25
+
+How do you start Metasploit?
+`msfconsole`
+
+What's the full name of the `smtp_version` module?
+auxiliary/scanner/smtp/smtp_version
+
+How do you list options of the selected module?
+`options`
+
+What options do we need to set?
+`RHOSTS`
+
+What is the system's name found by the exploit?
+`polosmtp.home`
+
+What Mail Transfer Agent (MTA) is running the SMTP server?
+Postfix (found with `telnet <TARGET-IP> <SMTP-PORT>`)
+
+What's the full name of the `smtp_enum` module?
+auxiliary/scanner/smtp/smtp_enum
