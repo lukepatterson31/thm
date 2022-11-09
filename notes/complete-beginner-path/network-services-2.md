@@ -294,14 +294,15 @@ Service detection performed. Please report any incorrect results at https://nmap
 ```
 
 started Metasploit and used `auxiliary/scanner/smtp/smtp_version` against the target and found the system's mail name: `polosmtp.home`
+found the MTA running the SMTP server: Postfix
 ```
 [+] 10.10.240.81:25       - 10.10.240.81:25 SMTP 220 polosmtp.home ESMTP Postfix (Ubuntu)\x0d\x0a
 [*] 10.10.240.81:25       - Scanned 1 of 1 hosts (100% complete)
 [*] Auxiliary module execution completed
 ```
-
-found the MTA running the SMTP server (`telnet <TARGET-IP> <SMTP-PORT>`): Postfix
+with telnet:
 ```
+telnet <TARGET-IP> <SMTP-PORT>
 Trying 10.10.240.81...
 Connected to 10.10.240.81.
 Escape character is '^]'.
@@ -341,3 +342,6 @@ Postfix (found with `telnet <TARGET-IP> <SMTP-PORT>`)
 
 What's the full name of the `smtp_enum` module?
 auxiliary/scanner/smtp/smtp_enum
+
+### Exploiting SMTP
+
