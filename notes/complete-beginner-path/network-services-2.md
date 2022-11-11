@@ -483,7 +483,19 @@ Nmap done: 1 IP address (1 host up) scanned in 0.40 seconds
 
 ```
 
-manual/non-Metasploit enumeration
+conect to mysql server with previously found credentials (root:password)
+mysql -h 10.10.42.24 -u root -p
+
+use Metasploit module `mysql_sql` setting USERNAME, PASSWORD and RHOSTS
+root, password, 10.10.42.24
+
+run exploit with default values `select version()`
+
+run exploit with `show databases`
+
+### Manual/non-Metasploit enumeration
+
+mysql enumeration
 ```
 $ nmap --script=mysql-enum 10.10.42.24
 Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-11 15:22 GMT
@@ -539,7 +551,83 @@ password/rhosts/username
 What does the default command give you?
 5.7.29-0ubuntu0.18.04.1
 
-How many databases are returned wioth the SQL option `show databases`?
+How many databases are returned with the SQL option `show databases`?
 4
 
- 
+## Exploiting MySQL
+
+What do we know?
+
+Let's take a sanity check before moving on to try and exploit the database fully, and gain more sensitive information than just database names. We know:
+
+1. MySQL server credentials 
+-> root:password
+
+2. The version of MySQL running 
+-> 5.7.29-0ubuntu0.18.04.1
+
+3. The number of Databases, and their names.
+-> information_schema
+-> mysql
+-> performance_schema
+-> sys
+
+Key Terminology
+
+In order to understand the exploits we're going to use next- we need to understand a few key terms.
+
+Schema:
+
+    In MySQL, physically, a schema is synonymous with a database. You can substitute the keyword "SCHEMA" instead of DATABASE in MySQL SQL syntax, for example using CREATE SCHEMA instead of CREATE DATABASE. It's important to understand this relationship because some other database products draw a distinction. For example, in the Oracle Database product, a schema represents only a part of a database: the tables and other objects owned by a single user. 
+
+Hashes:
+
+Hashes are, very simply, the product of a cryptographic algorithm to turn a variable length input into a fixed length output.
+
+In MySQL hashes can be used in different ways, for instance to index data into a hash table. Each hash has a unique ID that serves as a pointer to the original data. This creates an index that is significantly smaller than the original data, allowing the values to be searched and accessed more efficiently
+
+However, the data we're going to be extracting are password hashes which are simply a way of storing passwords not in plaintext format.
+
+search for and run Metasploit module `mysql_schemadump`
+
+search for and run Metasploit module `mysql_hashdump`
+
+retrieve password hash for non-default user `carl`
+
+crack hash with john the ripper
+
+try to login via ssh with credentials 
+
+retrieve flag from MySQL.txt
+
+Questions:
+
+What's the `mysql_schemadump` module's full name?
+auxiliary/scanner/mysql/mysql_schemadump
+
+What's the name of the last table dumped?
+x$waits_global_by_latency
+
+What's the `mysql_hashdump` module's full name?
+auxiliary/scanner/mysql/mysql_hashdump
+
+What non-default username stands out from the exploit results?
+carl
+
+Whats the user/hash combination?
+`carl:*EA031893AA21444B170FC2162A56978B8CEECE18`
+
+Using john the ripper against the hash, what is the password?
+doggie
+
+What's the contents of MySQL.txt?
+THM{congratulations_you_got_the_mySQL_flag}
+
+## Further learning
+
+Reading
+
+Here's some things that might be useful to read after completing this room, if it interests you:
+
+     https://web.mit.edu/rhel-doc/4/RH-DOCS/rhel-sg-en-4/ch-exploits.html
+     https://www.nextgov.com/cybersecurity/2019/10/nsa-warns-vulnerabilities-multiple-vpn-services/160456/
