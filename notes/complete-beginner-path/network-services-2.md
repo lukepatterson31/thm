@@ -345,3 +345,201 @@ auxiliary/scanner/smtp/smtp_enum
 
 ### Exploiting SMTP
 
+ran Hydra with username found through enumeration (administrator):
+```
+hydra -l administrator -t 16 -P /usr/share/wordlists/rockyou.txt -vV 10.10.215.207 ssh
+[22][ssh] host: 10.10.215.207   login: administrator   password: alejandro
+```
+
+Questions:
+
+What's the password of the user we found?
+alejandro
+
+What is the content of smtp.txt?
+THM{who_knew_email_servers_were_c00l?}
+
+## MySQL
+
+What is MySQL?
+
+In its simplest definition, MySQL is a relational database management system (RDBMS) based on Structured Query Language (SQL). Too many acronyms? Let's break it down:
+
+Database:
+
+A database is simply a persistent, organised collection of structured data
+
+RDBMS:
+
+A software or service used to create and manage databases based on a relational model. The word "relational" just means that the data stored in the dataset is organised as tables. Every table relates in some way to each other's "primary key" or other "key" factors.
+
+SQL:
+
+MYSQL is just a brand name for one of the most popular RDBMS software implementations. As we know, it uses a client-server model. But how do the client and server communicate? They use a language, specifically the Structured Query Language (SQL).
+
+Many other products, such as PostgreSQL and Microsoft SQL server, have the word SQL in them. This similarly signifies that this is a product utilising the Structured Query Language syntax.
+
+How does MySQL work?
+
+
+MySQL, as an RDBMS, is made up of the server and utility programs that help in the administration of MySQL databases.
+
+The server handles all database instructions like creating, editing, and accessing data. It takes and manages these requests and communicates using the MySQL protocol. This whole process can be broken down into these stages:
+
+    MySQL creates a database for storing and manipulating data, defining the relationship of each table.
+    Clients make requests by making specific statements in SQL.
+    The server will respond to the client with whatever information has been requested.
+
+What runs MySQL?
+
+MySQL can run on various platforms, whether it's Linux or windows. It is commonly used as a back end database for many prominent websites and forms an essential component of the LAMP stack, which includes: Linux, Apache, MySQL, and PHP.
+
+More Information:
+
+Here are some resources that explain the technical implementation, and working of, MySQL in more detail than I have covered here:
+
+https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_SQL_EXECUTION.html 
+
+https://www.w3schools.com/php/php_mysql_intro.asp
+
+## Enumerating MySQL
+
+When you would begin attacking MySQL
+
+MySQL is likely not going to be the first point of call when getting initial information about the server. You can, as we have in previous tasks, attempt to brute-force default account passwords if you really don't have any other information; however, in most CTF scenarios, this is unlikely to be the avenue you're meant to pursue.
+
+The Scenario
+
+Typically, you will have gained some initial credentials from enumerating other services that you can then use to enumerate and exploit the MySQL service. As this room focuses on exploiting and enumerating the network service, for the sake of the scenario, we're going to assume that you found the credentials: "root:password" while enumerating subdomains of a web server. After trying the login against SSH unsuccessfully, you decide to try it against MySQL.
+
+Requirements
+
+You will want to have MySQL installed on your system to connect to the remote MySQL server. In case this isn't already installed, you can install it using sudo apt install default-mysql-client. Don't worry- this won't install the server package on your system- just the client.
+
+Again, we're going to be using Metasploit for this; it's important that you have Metasploit installed, as it is by default on both Kali Linux and Parrot OS.
+
+Alternatives
+
+As with the previous task, it's worth noting that everything we will be doing using Metasploit can also be done either manually or with a set of non-Metasploit tools such as nmap's mysql-enum script: https://nmap.org/nsedoc/scripts/mysql-enum.html or https://www.exploit-db.com/exploits/23081. I recommend that after you complete this room, you go back and attempt it manually to make sure you understand the process that is being used to display the information you acquire. 
+
+nmap port scan
+```
+$ nmap -sT -p- -A 10.10.42.24
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-11 15:16 GMT
+Nmap scan report for 10.10.42.24
+Host is up (0.018s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 0636562ff0d4a4d2ab6a433ec0f99b2d (RSA)
+|   256 30bdbe28bd32dcf6ff28b2575731d9cf (ECDSA)
+|_  256 f23b824a5cd21819891fcd920ac7cf65 (ED25519)
+3306/tcp open  mysql   MySQL 5.7.29-0ubuntu0.18.04.1
+| mysql-info: 
+|   Protocol: 10
+|   Version: 5.7.29-0ubuntu0.18.04.1
+|   Thread ID: 14
+|   Capabilities flags: 65535
+|   Some Capabilities: Support41Auth, DontAllowDatabaseTableColumn, Speaks41ProtocolNew, InteractiveClient, ConnectWithDatabase, SupportsTransactions, SupportsLoadDataLocal, LongColumnFlag, SwitchToSSLAfterHandshake, SupportsCompression, FoundRows, IgnoreSpaceBeforeParenthesis, LongPassword, ODBCClient, Speaks41ProtocolOld, IgnoreSigpipes, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults
+|   Status: Autocommit
+|   Salt: 9|j\x0E\x7F5pz1&      =scOBq7 "
+|_  Auth Plugin Name: mysql_native_password
+| ssl-cert: Subject: commonName=MySQL_Server_5.7.29_Auto_Generated_Server_Certificate
+| Not valid before: 2020-04-23T10:13:27
+|_Not valid after:  2030-04-21T10:13:27
+|_ssl-date: TLS randomness does not represent time
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 13.66 seconds
+```
+
+nmap mysql-enum script scan
+```
+$ nmap --script=mysql-enum 10.10.42.24
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-11 15:22 GMT
+Nmap scan report for 10.10.42.24
+Host is up (0.010s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+3306/tcp open  mysql
+| mysql-enum: 
+|   Valid usernames: 
+|     root:<empty> - Valid credentials
+|     guest:<empty> - Valid credentials
+|     web:<empty> - Valid credentials
+|     user:<empty> - Valid credentials
+|     netadmin:<empty> - Valid credentials
+|     sysadmin:<empty> - Valid credentials
+|     administrator:<empty> - Valid credentials
+|     webadmin:<empty> - Valid credentials
+|     admin:<empty> - Valid credentials
+|     test:<empty> - Valid credentials
+|_  Statistics: Performed 10 guesses in 1 seconds, average tps: 10.0
+
+Nmap done: 1 IP address (1 host up) scanned in 0.40 seconds
+
+```
+
+manual/non-Metasploit enumeration
+```
+$ nmap --script=mysql-enum 10.10.42.24
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-11 15:22 GMT
+Nmap scan report for 10.10.42.24
+Host is up (0.010s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+3306/tcp open  mysql
+| mysql-enum: 
+|   Valid usernames: 
+|     root:<empty> - Valid credentials
+|     guest:<empty> - Valid credentials
+|     web:<empty> - Valid credentials
+|     user:<empty> - Valid credentials
+|     netadmin:<empty> - Valid credentials
+|     sysadmin:<empty> - Valid credentials
+|     administrator:<empty> - Valid credentials
+|     webadmin:<empty> - Valid credentials
+|     admin:<empty> - Valid credentials
+|     test:<empty> - Valid credentials
+|_  Statistics: Performed 10 guesses in 1 seconds, average tps: 10.0
+
+Nmap done: 1 IP address (1 host up) scanned in 0.40 seconds
+```
+show databases
+```
+$ nmap --script=mysql-databases --script-args=mysqluser=root,mysqlpass=password 10.10.42.24
+Starting Nmap 7.93 ( https://nmap.org ) at 2022-11-11 15:32 GMT
+Nmap scan report for 10.10.42.24
+Host is up (0.0096s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+3306/tcp open  mysql
+| mysql-databases: 
+|   information_schema
+|   mysql
+|   performance_schema
+|_  sys
+
+Nmap done: 1 IP address (1 host up) scanned in 0.38 seconds
+```
+
+Questions:
+
+What port is MySQL running on?
+3306
+
+What options do we need to set in Metasploit for the mysql_sql module?
+password/rhosts/username
+
+What does the default command give you?
+5.7.29-0ubuntu0.18.04.1
+
+How many databases are returned wioth the SQL option `show databases`?
+4
+
+ 
