@@ -73,3 +73,17 @@ modify settings on the system, etc.
 
 - A Standard User can only make changes to folders/files attributed to the user & can't 
 perform system-level changes, such as install programs.
+
+We can run `lusrmgr.msc` to see the User's and Groups on the machine
+
+### Task Manager
+
+The Task Manager provides information about the applications and processes currently running 
+on the system. Other information is also available, such as how much CPU and RAM are being 
+utilized, which falls under Performance.
+
+Shortcut: ctrl + shift + esc
+
+In-depth blog post about task manager:
+https://www.howtogeek.com/405806/windows-task-manager-the-complete-guide/
+
