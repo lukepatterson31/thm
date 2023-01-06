@@ -212,15 +212,18 @@ enabled to use it.
 
 When Kerberos is used for authentication, the following process happens:
 
-1. The user sends their username and a timestamp encrypted using a key derived from their 
-password to the Key Distribution Center (KDC), a service usually installed on the Domain 
+**1. TGT Exchange**
+
+The user sends their username and a timestamp encrypted using a key derived from their 
+password to the **Key Distribution Center** (KDC), a service usually installed on the Domain 
 Controller in charge of creating Kerberos tickets on the network.
 
-The KDC will create and send back a Ticket Granting Ticket (TGT), which will allow the user 
-to request additional tickets to access specific services. The need for a ticket to get more 
-tickets may sound a bit weird, but it allows users to request service tickets without 
+The KDC will create and send back a **Ticket Granting Ticket** (TGT), which will allow the 
+user to request additional tickets to access specific services. The need for a ticket to get 
+more tickets may sound a bit weird, but it allows users to request service tickets without 
 passing their credentials every time they want to connect to a service. Along with the TGT, 
-a Session Key is given to the user, which they will need to generate the following requests.
+a **Session Key** is given to the user, which they will need to generate the following 
+requests.
 
 Notice the TGT is encrypted using the krbtgt account's password hash, and therefore the user 
 can't access its contents. 
@@ -228,6 +231,8 @@ can't access its contents.
 *It is essential to know that the encrypted TGT includes a copy of the Session Key as part 
 of its contents, and the KDC has no need to store the Session Key as it can recover a copy 
 by decrypting the TGT if needed.*
+
+![Kerberos Authentication - TGT exchange](./pictures/kerberos1.png)
 
 Client: 
 	- key derived from user's password hash
@@ -239,22 +244,25 @@ Client -> {username, timestamp} encrypted with user key, requests TGT -> KDC (DC
 
 KDC -> {TGT} encrypted with krbtgt key, {Session Key} encrypted with user key-> Client
 
-2. When a user wants to connect to a service on the network like a share, website or 
-database, they will use their TGT to ask the KDC for a Ticket Granting Service (TGS). 
+**2. TGS Exchange**
+
+When a user wants to connect to a service on the network like a share, website or 
+database, they will use their TGT to ask the KDC for a **Ticket Granting Service** (TGS). 
 
 TGS are tickets that allow connection only to the specific service they were created for. 
 
 To request a TGS, the user will send their username and a timestamp encrypted using the 
-Session Key, along with the TGT and a Service Principal Name (SPN), which indicates the 
+Session Key, along with the TGT and a **Service Principal Name** (SPN), which indicates the 
 service and server name we intend to access.
 
-As a result, the KDC will send us a TGS along with a Service Session Key, which we will need 
-to authenticate to the service we want to access. 
+As a result, the KDC will send us a TGS along with a **Service Session Key**, which we will need to authenticate to the service we want to access. 
 
-The TGS is encrypted using a key derived from the Service Owner Hash.The Service Owner is 
-the user or machine account that the service runs under. The TGS contains a copy of the 
+The TGS is encrypted using a key derived from the **Service Owner Hash**. The Service Owner 
+is the user or machine account that the service runs under. The TGS contains a copy of the 
 Service Session Key on its encrypted contents so that the Service Owner can access it by 
 decrypting the TGS.
+
+![Kerberos Authentication - TGS exchange](./pictures/kerberos2.png)
 
 Client:
 	- SK (Session Key)
@@ -269,9 +277,13 @@ Client -> {username, timestamp} encrypted with SK, {TGT}, {SPN}, request TGS -> 
 
 KDC -> {TGS} encrypted with Service Owner Hash, {Svc Session Key} encrypted with SK -> Client
 
-3. The TGS can then be sent to the desired service to authenticate and establish a 
+**3. Authenticate To Service**
+
+The TGS can then be sent to the desired service to authenticate and establish a 
 connection. The service will use its configured account's password hash to decrypt the TGS 
 and validate the Service Session Key.
+
+![Kerberos Authentication - Authenticate To Service](./pictures/kerberos3.png)
 
 Client:
 	- SSK (Svc Session Key)
@@ -285,6 +297,8 @@ Client -> {username, timestamp} encrypted with SSK, {TGS} encrypted with SOH, au
 SRV -> decrypt TGS with SOH key and validate the SSK
 
 #### NetNTLM
+
+![NetNTLM Authentication](./pictures/netntlm.png)
 
 NetNTLM works using a challenge-response mechanism. The entire process is as follows:
 
@@ -313,3 +327,53 @@ with the domain controller since it has the password hash stored locally on its 
 
 ### Trees, Forests and Trusts
 
+#### Trees
+
+Active Directory supports integrating multiple domains so that you can partition your 
+network into units that can be managed independently. If you have two domains that share the 
+same namespace (`thm.local` in our example), those domains can be joined into a Tree.
+
+If our thm.local domain was split into two subdomains for UK and US branches, you could 
+build a tree with a root domain of thm.local and two subdomains called `uk.thm.local` and 
+`us.thm.local`, each with its AD, computers and users.
+
+![Tree](./pictures/tree.png)
+
+The partitioned structure gives us better control over who can access what in the domain.
+The UK DC manages UK resources only and the US DC manages US resources only. Domain 
+Administrators of each branch will have complete control over their respective DCs, but not 
+other branches' DCs. Policies can also be configured independently for each domain in the 
+tree.
+
+A new security group needs to be introduced when talking about trees and forests. The 
+**Enterprise Admins** group will grant a user administrative privileges over all of an 
+enterprise's domains. Each domain would still have its Domain Admins with administrator 
+privileges over their single domains and the Enterprise Admins who can control everything in 
+the enterprise.
+
+#### Forests
+
+The union of several trees with different namespaces into the same network.
+
+![Tree](./pictures/forest.png)
+
+#### Trust Relationships
+
+Trust relationships allow cross domain access. The simplest is a **one-way trust 
+relationship** In a one-way trust, if `Domain AAA` trusts `Domain BBB`, this means that a 
+user on BBB can be authorised to access resources on AAA.
+
+```
+				-- Trust Direction --> 
+	DOMAIN AAA		 					DOMAIN BBB
+				<-- Access Direction --
+```
+
+**Two-way trust relationships** can also be made to allow both domains to mutually authorise 
+users from the other. By default, joining several domains under a tree or a forest will form 
+a two-way trust relationship.
+
+It is important to note that having a trust relationship between domains doesn't 
+automatically grant access to all resources on other domains. Once a trust relationship is 
+established, you have the chance to authorise users across different domains, but it's up to 
+you what is actually authorised or not.
