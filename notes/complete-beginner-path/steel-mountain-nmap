@@ -1,0 +1,64 @@
+# Nmap 7.93 scan initiated Wed Feb  1 09:06:30 2023 as: nmap -sC -v -oN steel-mountain-nmap 10.10.141.91
+Nmap scan report for 10.10.141.91
+Host is up (0.0099s latency).
+Not shown: 988 closed tcp ports (conn-refused)
+PORT      STATE SERVICE
+80/tcp    open  http
+| http-methods: 
+|   Supported Methods: OPTIONS TRACE GET HEAD POST
+|_  Potentially risky methods: TRACE
+|_http-title: Site doesn't have a title (text/html).
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+445/tcp   open  microsoft-ds
+3389/tcp  open  ms-wbt-server
+| ssl-cert: Subject: commonName=steelmountain
+| Issuer: commonName=steelmountain
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha1WithRSAEncryption
+| Not valid before: 2023-01-31T09:02:43
+| Not valid after:  2023-08-02T09:02:43
+| MD5:   597ea912c5648a726f9eaa5c0aecd9ee
+|_SHA-1: dd02943d471edf906a35fd35fa8cc0e5616f1cd8
+|_ssl-date: 2023-02-01T09:06:31+00:00; 0s from scanner time.
+| rdp-ntlm-info: 
+|   Target_Name: STEELMOUNTAIN
+|   NetBIOS_Domain_Name: STEELMOUNTAIN
+|   NetBIOS_Computer_Name: STEELMOUNTAIN
+|   DNS_Domain_Name: steelmountain
+|   DNS_Computer_Name: steelmountain
+|   Product_Version: 6.3.9600
+|_  System_Time: 2023-02-01T09:06:31+00:00
+8080/tcp  open  http-proxy
+|_http-title: HFS /
+|_http-favicon: Unknown favicon MD5: 759792EDD4EF8E6BC2D1877D27153CB1
+| http-methods: 
+|_  Supported Methods: GET HEAD POST
+49152/tcp open  unknown
+49153/tcp open  unknown
+49154/tcp open  unknown
+49155/tcp open  unknown
+49156/tcp open  unknown
+49163/tcp open  unknown
+
+Host script results:
+| smb2-security-mode: 
+|   302: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2023-02-01T09:06:31
+|_  start_date: 2023-02-01T09:02:36
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| nbstat: NetBIOS name: STEELMOUNTAIN, NetBIOS user: <unknown>, NetBIOS MAC: 028f6b9aff37 (unknown)
+| Names:
+|   STEELMOUNTAIN<20>    Flags: <unique><active>
+|   STEELMOUNTAIN<00>    Flags: <unique><active>
+|_  WORKGROUP<00>        Flags: <group><active>
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Wed Feb  1 09:08:10 2023 -- 1 IP address (1 host up) scanned in 100.14 seconds
