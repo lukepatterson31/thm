@@ -94,7 +94,7 @@ Find DB connection strings
 
 PuTTY stores proxy credentials including cleartext authentication credentials. Search under the following registry key:
 
-`type $env:userprofile\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt`
+`reg query HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions\ /f "Proxy" /s`
 
 ### Other Quick Wins
 
