@@ -1,0 +1,2 @@
+# Nmap 7.93 scan initiated Mon Mar 13 16:45:19 2023 as: nmap -sV -p 3306 --script mysql-audit,mysql-databases,mysql-dump-hashes,mysql-empty-password,mysql-enum,mysql-info,mysql-query,mysql-users,mysql-variables,mysql-vuln-cve2012-2122 -oN /home/gweil0/daily-bugle/daily-bugle-mysql.nmap 10.10.115.128
+# Nmap done at Mon Mar 13 16:45:22 2023 -- 1 IP address (0 hosts up) scanned in 3.19 seconds

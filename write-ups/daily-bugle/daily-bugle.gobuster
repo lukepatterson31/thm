@@ -1,0 +1,15 @@
+/images              [36m (Status: 301)[0m [Size: 236][34m [--> http://10.10.115.128/images/][0m
+/media               [36m (Status: 301)[0m [Size: 235][34m [--> http://10.10.115.128/media/][0m
+/templates           [36m (Status: 301)[0m [Size: 239][34m [--> http://10.10.115.128/templates/][0m
+/modules             [36m (Status: 301)[0m [Size: 237][34m [--> http://10.10.115.128/modules/][0m
+/bin                 [36m (Status: 301)[0m [Size: 233][34m [--> http://10.10.115.128/bin/][0m
+/plugins             [36m (Status: 301)[0m [Size: 237][34m [--> http://10.10.115.128/plugins/][0m
+/includes            [36m (Status: 301)[0m [Size: 238][34m [--> http://10.10.115.128/includes/][0m
+/language            [36m (Status: 301)[0m [Size: 238][34m [--> http://10.10.115.128/language/][0m
+/components          [36m (Status: 301)[0m [Size: 240][34m [--> http://10.10.115.128/components/][0m
+/cache               [36m (Status: 301)[0m [Size: 235][34m [--> http://10.10.115.128/cache/][0m
+/libraries           [36m (Status: 301)[0m [Size: 239][34m [--> http://10.10.115.128/libraries/][0m
+/tmp                 [36m (Status: 301)[0m [Size: 233][34m [--> http://10.10.115.128/tmp/][0m
+/layouts             [36m (Status: 301)[0m [Size: 237][34m [--> http://10.10.115.128/layouts/][0m
+/administrator       [36m (Status: 301)[0m [Size: 243][34m [--> http://10.10.115.128/administrator/][0m
+/cli                 [36m (Status: 301)[0m [Size: 233][34m [--> http://10.10.115.128/cli/][0m
