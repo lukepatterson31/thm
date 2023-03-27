@@ -12,8 +12,9 @@ Prints system information giving us additional information about the kernel used
 
 #### `/proc/version`
 
-The proc filesystem (procfs) provides information about the target system processes. May give
-information on the kernel version and additional data such as whether a compiler is installed
+The proc filesystem (procfs) provides information about the target system processes. May
+give information on the kernel version and additional data such as whether a compiler is 
+installed
 
 #### `/etc/issue`
 
