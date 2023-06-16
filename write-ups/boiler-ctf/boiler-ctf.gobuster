@@ -1,0 +1,116 @@
+
+gobuster dir -u http://10.10.14.37:80 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+===============================================================
+Gobuster v3.5
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.10.14.37:80
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.5
+[+] Timeout:                 10s
+===============================================================
+2023/06/16 10:56:34 Starting gobuster in directory enumeration mode
+===============================================================
+/manual               (Status: 301) [Size: 311] [--> http://10.10.14.37/manual/]
+/joomla               (Status: 301) [Size: 311] [--> http://10.10.14.37/joomla/]
+/server-status        (Status: 403) [Size: 299]
+Progress: 220224 / 220561 (99.85%)
+===============================================================                                                     
+2023/06/16 10:59:45 Finished                                                                                        
+===============================================================
+
+
+
+gobuster dir -u http://10.10.14.37:80/joomla -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+===============================================================
+Gobuster v3.5
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.10.14.37:80/joomla
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.5
+[+] Timeout:                 10s
+===============================================================
+2023/06/16 11:09:43 Starting gobuster in directory enumeration mode
+===============================================================
+/images               (Status: 301) [Size: 318] [--> http://10.10.14.37/joomla/images/]
+	/headers              (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/images/headers/]
+	/banners              (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/images/banners/]
+/media                (Status: 301) [Size: 317] [--> http://10.10.14.37/joomla/media/]
+	/contacts             (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/media/contacts/]
+	/system               (Status: 301) [Size: 326] [--> http://10.10.215.96/joomla/media/system/]
+	/cms                  (Status: 301) [Size: 323] [--> http://10.10.215.96/joomla/media/cms/]
+	/editors              (Status: 301) [Size: 327] [--> http://10.10.215.96/joomla/media/editors/]
+	/mailto               (Status: 301) [Size: 326] [--> http://10.10.215.96/joomla/media/mailto/]
+	/media                (Status: 301) [Size: 325] [--> http://10.10.215.96/joomla/media/media/]
+/templates            (Status: 301) [Size: 321] [--> http://10.10.14.37/joomla/templates/]
+	/system               (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/templates/system/]
+/modules              (Status: 301) [Size: 319] [--> http://10.10.14.37/joomla/modules/]
+/tests                (Status: 301) [Size: 317] [--> http://10.10.14.37/joomla/tests/]
+	/javascript           (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/tests/javascript/]
+	/unit                 (Status: 301) [Size: 324] [--> http://10.10.215.96/joomla/tests/unit/]
+/bin                  (Status: 301) [Size: 315] [--> http://10.10.14.37/joomla/bin/]
+/plugins              (Status: 301) [Size: 319] [--> http://10.10.14.37/joomla/plugins/]
+	/content              (Status: 301) [Size: 329] [--> http://10.10.215.96/joomla/plugins/content/]
+	/search               (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/plugins/search/]
+	/user                 (Status: 301) [Size: 326] [--> http://10.10.215.96/joomla/plugins/user/]
+	/privacy              (Status: 301) [Size: 329] [--> http://10.10.215.96/joomla/plugins/privacy/]
+	/system               (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/plugins/system/]
+	/editors              (Status: 301) [Size: 329] [--> http://10.10.215.96/joomla/plugins/editors/]
+	/authentication       (Status: 301) [Size: 336] [--> http://10.10.215.96/joomla/plugins/authentication/]
+	/captcha              (Status: 301) [Size: 329] [--> http://10.10.215.96/joomla/plugins/captcha/]
+	/finder               (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/plugins/finder/]
+	/installer            (Status: 301) [Size: 331] [--> http://10.10.215.96/joomla/plugins/installer/]
+	/extension            (Status: 301) [Size: 331] [--> http://10.10.215.96/joomla/plugins/extension/]
+	/fields               (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/plugins/fields/]
+/includes             (Status: 301) [Size: 320] [--> http://10.10.14.37/joomla/includes/]
+/language             (Status: 301) [Size: 320] [--> http://10.10.14.37/joomla/language/]
+/components           (Status: 301) [Size: 322] [--> http://10.10.14.37/joomla/components/]
+/cache                (Status: 301) [Size: 317] [--> http://10.10.14.37/joomla/cache/]
+/libraries            (Status: 301) [Size: 321] [--> http://10.10.14.37/joomla/libraries/]
+	/cms                  (Status: 301) [Size: 327] [--> http://10.10.215.96/joomla/libraries/cms/]
+	/src                  (Status: 301) [Size: 327] [--> http://10.10.215.96/joomla/libraries/src/]
+	/vendor               (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/libraries/vendor/]
+	/legacy               (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/libraries/legacy/]
+	/joomla               (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/libraries/joomla/]
+	/phpass               (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/libraries/phpass/]
+/installation         (Status: 301) [Size: 324] [--> http://10.10.14.37/joomla/installation/]
+	/html                 (Status: 301) [Size: 331] [--> http://10.10.215.96/joomla/installation/html/]
+	/view                 (Status: 301) [Size: 331] [--> http://10.10.215.96/joomla/installation/view/]
+	/template             (Status: 301) [Size: 335] [--> http://10.10.215.96/joomla/installation/template/]
+	/form                 (Status: 301) [Size: 331] [--> http://10.10.215.96/joomla/installation/form/]
+	/language             (Status: 301) [Size: 335] [--> http://10.10.215.96/joomla/installation/language/]
+	/cache                (Status: 301) [Size: 332] [--> http://10.10.215.96/joomla/installation/cache/]
+	/application          (Status: 301) [Size: 338] [--> http://10.10.215.96/joomla/installation/application/]
+	/INSTALL              (Status: 200) [Size: 4560]
+	/sql                  (Status: 301) [Size: 330] [--> http://10.10.215.96/joomla/installation/sql/]
+	/controller           (Status: 301) [Size: 337] [--> http://10.10.215.96/joomla/installation/controller/]
+	/model                (Status: 301) [Size: 332] [--> http://10.10.215.96/joomla/installation/model/]
+	/response             (Status: 301) [Size: 335] [--> http://10.10.215.96/joomla/installation/response/]
+	/CREDITS              (Status: 200) [Size: 571]
+	/COPYRIGHT            (Status: 200) [Size: 880]
+	/helper               (Status: 301) [Size: 333] [--> http://10.10.215.96/joomla/installation/helper/]
+/build                (Status: 301) [Size: 317] [--> http://10.10.14.37/joomla/build/]
+	/tmp                  (Status: 301) [Size: 323] [--> http://10.10.215.96/joomla/build/tmp/]
+	/less                 (Status: 301) [Size: 324] [--> http://10.10.215.96/joomla/build/less/]
+	/jenkins              (Status: 301) [Size: 327] [--> http://10.10.215.96/joomla/build/jenkins/]
+	/bootstrap            (Status: 301) [Size: 329] [--> http://10.10.215.96/joomla/build/bootstrap/]
+	/travis               (Status: 301) [Size: 326] [--> http://10.10.215.96/joomla/build/travis/]
+/tmp                  (Status: 301) [Size: 315] [--> http://10.10.14.37/joomla/tmp/]
+/layouts              (Status: 301) [Size: 319] [--> http://10.10.14.37/joomla/layouts/]
+	/plugins              (Status: 301) [Size: 329] [--> http://10.10.215.96/joomla/layouts/plugins/]
+	/libraries            (Status: 301) [Size: 331] [--> http://10.10.215.96/joomla/layouts/libraries/]
+	/joomla               (Status: 301) [Size: 328] [--> http://10.10.215.96/joomla/layouts/joomla/]
+/administrator        (Status: 301) [Size: 325] [--> http://10.10.14.37/joomla/administrator/]
+/cli                  (Status: 301) [Size: 315] [--> http://10.10.14.37/joomla/cli/]
+/_files               (Status: 301) [Size: 318] [--> http://10.10.14.37/joomla/_files/]
+Progress: 220153 / 220561 (99.82%)
+===============================================================
+2023/06/16 11:12:55 Finished
+===============================================================
