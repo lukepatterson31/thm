@@ -1,0 +1,14 @@
+{
+    "cms_id": "wp",
+    "cms_name": "WordPress",
+    "cms_url": "https://wordpress.org",
+    "detection_param": "header",
+    "last_scanned": "2023-06-17 09:26:22.197950",
+    "url": "http://blog.thm",
+    "wp_license": "http://blog.thm/license.txt",
+    "wp_readme_file": "http://blog.thm/readme.html",
+    "wp_themes": "twentytwenty Version 1.3,",
+    "wp_uploads_directory": "http://blog.thm/wp-content/uploads",
+    "wp_users": "kwheel,bjoel,",
+    "wp_version": "5.0"
+}
