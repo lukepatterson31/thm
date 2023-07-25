@@ -1,0 +1,24 @@
+# Nmap 7.93 scan initiated Mon Mar 13 10:07:48 2023 as: nmap -sC -v -oN daily-bugle.nmap 10.10.160.110
+Nmap scan report for 10.10.160.110
+Host is up (0.0073s latency).
+Not shown: 997 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+| ssh-hostkey: 
+|   2048 68ed7b197fed14e618986dc58830aae9 (RSA)
+|   256 5cd682dab219e33799fb96820870ee9d (ECDSA)
+|_  256 d2a975cf2f1ef5444f0b13c20fd737cc (ED25519)
+80/tcp   open  http
+|_http-title: Home
+| http-robots.txt: 15 disallowed entries 
+| /joomla/administrator/ /administrator/ /bin/ /cache/ 
+| /cli/ /components/ /includes/ /installation/ /language/ 
+|_/layouts/ /libraries/ /logs/ /modules/ /plugins/ /tmp/
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-favicon: Unknown favicon MD5: 1194D7D32448E1F90741A97B42AF91FA
+|_http-generator: Joomla! - Open Source Content Management
+3306/tcp open  mysql
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Mon Mar 13 10:07:51 2023 -- 1 IP address (1 host up) scanned in 3.34 seconds
