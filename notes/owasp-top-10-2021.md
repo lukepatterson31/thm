@@ -69,8 +69,8 @@ Injection attacks depend on what technologies are used and how these technologie
 
 Some common examples include:
 
-- SQL Injection: This occurs when user-controlled input is passed to SQL queries. An attacker can pass in SQL 
-queries to manipulate the outcome of such queries. This could potentially allow the attacker to access, 
+- SQL Injection: This occurs when user-controlled input is passed to SQL queries. An attacker can pass in 
+SQL queries to manipulate the outcome of such queries. This could potentially allow the attacker to access, 
 modify and delete information in a database when this input is passed into database queries.
 
 - Command Injection: This occurs when user input is passed to system commands. An attacker can execute 
@@ -131,3 +131,27 @@ We can view the source code to grab the flag
 ![Debugging Interface](./pictures/owasp-top-10-2021-security-misconfiguration-flag.png)
 
 ### 6. Vulnerable and Outdated Components
+
+Vulnerabilities for older versions of software that are well known, and easily exploitable as a result.
+
+**Vulnerable and Outdated Components Lab**
+
+The target app is vulnerable to SQLi in the password parameter in the admin login page
+
+![SQLi](./pictures/owasp-top-10-2021-vulnerable-components-admin-sqli.png)
+
+Admin Book List
+
+![admin access](./pictures/owasp-top-10-2021-vulnerable-components-admin-book.png)
+
+Using the /admin_add.php page we can upload a PHP webshell
+
+![shell upload](./pictures/owasp-top-10-2021-vulnerable-components-upload-shell.png)
+
+Set cmd to cat and get the flag
+
+![Flag](./pictures/owasp-top-10-2021-vulnerable-components-flag.png)
+
+### 7. Identification and Authentication Failures
+
+
