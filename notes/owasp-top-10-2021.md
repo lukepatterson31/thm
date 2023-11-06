@@ -184,4 +184,107 @@ Register as arthur adding a space in front, then login with the newly created pa
 
 ### 8. Software and Data Integrity Failures
 
+**What is Integrity?**
 
+Integrity in cyber security means data is complete, trustworthy and has not been modified or accidentally 
+altered by an unauthorised user. You will often see a hash sent alongside the file so that you can prove 
+that the file you downloaded kept its integrity and wasn't modified in transit.
+
+**Software and Data Integrity Failures**
+
+This vulnerability arises from code or infrastructure that uses software or data without using any kind of 
+integrity checks. Since no integrity verification is being done, an attacker might modify the software or 
+data passed to the application, resulting in unexpected consequences. 
+
+There are typically two types of vulnerabilities in this category:
+
+- Data Integrity Failures
+- Software Integrity Failures
+
+**Software Integrity Failures**
+
+Failure to verify third party library URL hashes before loading the content can lead to software integrity 
+failures. Use Subresource Integrity (SRI) to check the integrity of a given source, generate hashes with 
+https://www.srihash.org/ and add an integrity hash to the HTML:
+
+`<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>`
+
+**Data Integrity Failures**
+
+A data integrity failure vulnerability was present on some libraries implementing JWTs a while ago. As we 
+have seen, JWT implements a signature to validate the integrity of the payload data. The vulnerable 
+libraries allowed attackers to bypass the signature validation by changing the two following things in a JWT:
+
+1. Modify the header section of the token so that the alg header would contain the value none.
+2. Remove the signature part.
+
+![JWT](./pictures/owasp-top-10-2021-software-and-data-integrity-failures-jwt.png)
+
+### 9. Security Logging and Monitoring Failures
+
+When web applications are set up, every action performed by the user should be logged. Logging is important 
+because, in the event of an incident, the attackers' activities can be traced. Once their actions are 
+traced, their risk and impact can be determined.
+
+The more significant impacts of these include:
+
+- Regulatory damage: if an attacker has gained access to personally identifiable user information and there 
+is no record of this, final users are affected, and the application owners may be subject to fines or more 
+severe actions depending on regulations.
+
+- Risk of further attacks: an attacker's presence may be undetected without logging. This could allow an 
+attacker to launch further attacks against web application owners by stealing credentials, attacking 
+infrastructure and more.
+
+The information stored in logs should include the following:
+
+- HTTP status codes
+- Time Stamps
+- Usernames
+- API endpoints/page locations
+- IP addresses
+
+The ideal case is to have monitoring in place to detect any suspicious activity. The aim of detecting
+suspicious activity is to either stop the attacker completely or reduce the impact they've made if their
+presence has been detected much later than anticipated. 
+
+Common examples of suspicious activity include:
+
+- Multiple unauthorised attempts for a particular action (usually authentication attempts or access to 
+unauthorised resources, e.g. admin pages)
+
+- Requests from anomalous IP addresses or locations: while this can indicate that someone else is trying to 
+access a particular user's account, it can also have a false positive rate.
+
+- Use of automated tools: particular automated tooling can be easily identifiable, e.g. using the value of 
+User-Agent headers or the speed of requests. This can indicate that an attacker is using automated tooling.
+
+- Common payloads: in web applications, it's common for attackers to use known payloads. Detecting the use 
+of these payloads can indicate the presence of someone conducting unauthorised/malicious testing on 
+applications.
+
+### 10. Server-Side Request Forgery (SSRF)
+
+SSRF occurs when an attacker can coerce a web application into sending requests on their behalf to arbitrary 
+destinations while having control of the contents of the request itself. SSRF vulnerabilities often arise 
+from implementations where our web application needs to use third-party services. 
+
+**Practical Example**
+
+Navigating to the page shows us a download link vulnerable to SSRF
+
+![SSRF](./pictures/owasp-top-10-2021-ssrf-download.png)
+
+If we start a netcat listener and replace the file storage URL with our IP we can grab any headers:
+
+![API key](./pictures/owasp-top-10-2021-ssrf-api-key.png)
+
+**Extra credit**
+
+To gain access to the admin panel we can use SSRF to grab the /admin page
+
+Escape the ID param with URL encoded `#` which is `%23`
+
+http://10.10.80.83:8087/download?server=http://localhost:8087/admin%23&id=75482342
+
+![admin flag](./pictures/owasp-top-10-2021-ssrf-flag.png)
