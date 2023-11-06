@@ -154,4 +154,34 @@ Set cmd to cat and get the flag
 
 ### 7. Identification and Authentication Failures
 
+Common flaws in authentication mechanisms:
+
+- Brute force attacks: If a web application uses usernames and passwords, an attacker can try to launch 
+brute force attacks that allow them to guess the username and passwords using multiple authentication 
+attempts.  
+- Use of weak credentials: Web applications should set strong password policies.  
+- Weak Session Cookies: Session cookies are how the server keeps track of users. If session cookies contain 
+predictable values, attackers can set their own session cookies and access users' accounts.  
+
+Mitigations for broken authentication mechanisms:
+
+- To avoid password-guessing attacks, ensure the application enforces a strong password policy.  
+- To avoid brute force attacks, ensure that the application enforces an automatic lockout after a certain 
+number of attempts.  
+- Implement Multi-Factor Authentication.  
+
+**Identification and Authentication Failures Practical**
+
+Using user re-registration to exploit a flaw in the authentication mechanism
+
+Register as darren adding a space in front, then login with the newly created password
+![register](./pictures/owasp-top-10-2021-id-and-auth-failure-register-darren.png)
+![login](./pictures/owasp-top-10-2021-id-and-auth-failure-darren.png)
+
+Register as arthur adding a space in front, then login with the newly created password
+![register](./pictures/owasp-top-10-2021-id-and-auth-failure-register-arthur.png)
+![login](./pictures/owasp-top-10-2021-id-and-auth-failure-arthur.png)
+
+### 8. Software and Data Integrity Failures
+
 
