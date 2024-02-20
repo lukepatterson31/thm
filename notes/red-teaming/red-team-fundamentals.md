@@ -37,6 +37,55 @@ emulate a real threat actor's TTPs to measure how well the Blue Team responds to
 
 ### Teams and Functions of an Engagement
 
+Definitions from https://redteam.guide
+
+Teams:
+
 [Blue Cell](https://redteam.guide/docs/definitions/#blue-cell)
 [Red Cell](https://redteam.guide/docs/definitions/#red-cell)
 [White Cell](https://redteam.guide/docs/definitions/#white-cell)
+
+Roles:
+[Red Team Lead](https://redteam.guide/docs/definitions/#red-team-lead)
+[Red Team Operator](https://redteam.guide/docs/definitions/#red-team-operator)
+
+### Engagement Structure
+
+Standard Cyber Kill Chains:
+
+- [Lockheed Martin Cyber Kill Chain](https://www.lockheedmartin.com/en-us/capabilities/cyber/cyber-kill-chain.html)  
+- [Unified Kill Chain](https://unifiedkillchain.com/)  
+- [Varonis Cyber Kill Chain](https://www.varonis.com/blog/cyber-kill-chain/)  
+- [Active Directory Attack Cycle](https://github.com/infosecn1nja/AD-Attack-Defense)  
+- [MITRE ATT&CK Framework](https://attack.mitre.org/)  
+
+Lockheed Martin Cyber Kill Chain components:
+
+|Technique | Purpose | Examples |
+|----------|---------|----------|
+| Reconnaissance | Obtain information on the target | Harvesting emails, OSINT |
+| Weaponization | Combine the objective with an exploit. Commonly results in a deliverable payload. |Exploit with backdoor, malicious office document |
+| Delivery | How will the weaponized function be delivered to the target | Email, web, USB |
+| Exploitation | Exploit the target's system to execute code | MS17-010, Zero-Logon, etc. |
+| Installation | Install malware or other tooling | Mimikatz, Rubeus, etc. |
+| Command & Control | Control the compromised asset from a remote central controller | Empire, Cobalt Strike, etc. |
+| Actions on Objectives | Any end objectives: ransomware, data exfiltration, etc. | Conti, LockBit2.0, etc. |
+
+### Overview of a Red Team Engagement
+
+1. Planning the Engagement: White and red teams define goals that align with business risk scenarios  
+
+2. Intelligence Gathering: The red team gathers as much information as they can about the target
+
+- Technologies in use  
+- List of employees  
+- Information from social media  
+- Photos  
+- Any other usable information  
+
+  Threat intelligence sources are used to check for APTs targeting similar companies.  
+  They create a plan that includes several TTPs that fit the target and get approval from the white team.  
+
+3. Emulating TTPs: The red team starts the campaign by emulating TTPs of the chosen APT  
+
+4. Reporting and Analysis: After the exercise, the white, red, and blue teams meet and discuss how to improve the security of the target
