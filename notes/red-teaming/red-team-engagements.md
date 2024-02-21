@@ -48,3 +48,88 @@ An example campaign summary adapted from military operations documents:
 [redteam.guide example of a campaign plan](https://redteam.guide/docs/checklists/red-team-checklist/)
 
 ### Engagement Documentation
+
+Engagement documentation is an extension of campaign planning
+
+**Engagement Plan:**
+
+| Component | Purpose |
+|-----------|---------|
+| CONOPS (Concept of Operations) | Non-technically written overview of how the red team meets client objectives and target the client. |
+| Resource plan | Includes timelines and information required for the red team to be successful — any resource requirements: personnel, hardware, cloud requirements. |
+
+**Operations Plan:**
+
+| Component | Purpose |
+|-----------|---------|
+| Personnel | Information on employee requirements. |
+| Stopping conditions | How and why should the red team stop during the engagement. |
+| RoE (optional) | - |
+| Technical requirements | What knowledge will the red team need to be successful. |
+
+**Mission Plan:**
+
+| Component | Purpose |
+|-----------|---------|
+| Command playbooks (optional) | Exact commands and tools to run, including when, why, and how. Commonly seen in larger teams with many operators at varying skill levels. |
+| Execution times | Times to begin stages of engagement. Can optionally include exact times to execute tools and commands. |
+| Responsibilities/roles | Who does what, when. |
+
+**Remediation Plan (optional):**
+
+| Component | Purpose |
+|-----------|---------|
+| Report | Summary of engagement details and report of findings. |
+| Remediation/consultation | How will the client remediate findings? It can be included in the report or discussed in a meeting between the client and the red team. |
+
+### Concept of Operations (CONOPS)
+
+CONOPS details a high-level overview of the proceedings of an engagement. It serves as a business/client
+reference and a reference for the red cell to build off of and extend to further campaign plans. It 
+should be written from a semi-technical summary perspective
+
+Outline of critical components:
+
+- Client Name
+- Service Provider
+- Timeframe
+- General Objectives/Phases
+- Other Training Objectives (Exfiltration)
+- High-level Tools/Techniques planned to be used
+- Threat group to emulate (if any)
+
+The key to writing and understanding a CONOPS is to provide just enough information to get a general 
+understanding of all on-goings. The CONOPS should be easy to read and show clear definitions and points 
+that readers can easily digest.
+
+### Resource Plan
+
+The resource plan extends the CONOPS, including specific details such as dates, knowledge required, etc.
+It is written as bulleted lists of subsections
+
+Example subsections:
+
+- Header
+    - Personnel writing
+    - Dates
+    - Customer
+Engagement Dates
+    - Reconnaissance Dates
+    - Initial Compromise Dates
+    - Post-Exploitation and Persistence Dates
+    - Misc. Dates
+- Knowledge Required (optional)
+    - Reconnaissance
+    - Initial Compromise
+    - Post-Exploitation
+- Resource Requirements
+    - Personnel
+    - Hardware
+    - Cloud
+    - Misc.
+
+The document should be straight to the point and define what is needed
+
+### Operations Plan
+
+
