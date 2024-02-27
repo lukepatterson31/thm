@@ -55,7 +55,7 @@ Engagement documentation is an extension of campaign planning
 
 | Component | Purpose |
 |-----------|---------|
-| CONOPS (Concept of Operations) | Non-technically written overview of how the red team meets client objectives and target the client. |
+| CONOPS (Concept of Operations) | Non-technically written overview of how the red team meets client objectives and targets the client. |
 | Resource plan | Includes timelines and information required for the red team to be successful — any resource requirements: personnel, hardware, cloud requirements. |
 
 **Operations Plan:**
@@ -85,7 +85,7 @@ Engagement documentation is an extension of campaign planning
 ### Concept of Operations (CONOPS)
 
 CONOPS details a high-level overview of the proceedings of an engagement. It serves as a business/client
-reference and a reference for the red cell to build off of and extend to further campaign plans. It 
+reference and a reference for the red cell to build from and extend to further campaign plans. It 
 should be written from a semi-technical summary perspective
 
 Outline of critical components:
@@ -132,4 +132,32 @@ The document should be straight to the point and define what is needed
 
 ### Operations Plan
 
+The operations plan is a document that provides specific details of the engagement and actions occuring. 
+It expands on the current CONOPS and should include the majority of specific engagement information and 
+uses bulleted lists and small sub-sections.
+
+Example:
+
+
+- Header
+    - Personnel writing
+    - Dates
+    - Customer
+- Halting/stopping conditions (can be placed in ROE depending on depth)
+- Required/assigned personnel
+- Specific TTPs and attacks planned
+- Communications plan (Summarize how the red cell with communicate with other cells and the client; Email, vectr.io, Slack, etc.)
+- Rules of Engagement (optional)
+
+### The Mission Plan
+
+A cell-specific document that details exact actions to be completed by operators
+
+Minimum details to be included:
+
+- Objectives
+- Operators
+- Exploits/Attacks
+- Targets (users/machines/objectives)
+- Execution plan variations
 
