@@ -21,9 +21,9 @@ Leverage CTI to emulate adversaries
 
 Threat intel platforms and frameworks:
 
-- MITRE ATT&CK
-- TIBER-EU
-- OST Map
+- [MITRE ATT&CK](https://attack.mitre.org/)
+- [TIBER-EU](https://www.ecb.europa.eu/paym/cyber-resilience/tiber-eu/html/index.en.html)
+- [OST Map](https://www.intezer.com/ost-map/)
 
 Select an adversary, identify TTPs of the chosen adversary, and map them to a known cyber kill chain
 
@@ -40,4 +40,12 @@ Links:
 
 ### TTP Mapping
 
+Collect adversary TTPs using threat intel frameworks and then map them to the steps of the chosen cyber 
+kill chain
 
+Choose an adversary based on:
+
+1. Target industry
+2. Employed attack vectors
+3. Country of origin
+4. Other factors
