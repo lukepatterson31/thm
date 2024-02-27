@@ -16,3 +16,28 @@ From a red team perspective, you can think of threat intelligence as the red tea
 team's ability to properly leverage CTI for detections.
 
 ### Applying Threat Intel to the Red Team
+
+Leverage CTI to emulate adversaries
+
+Threat intel platforms and frameworks:
+
+- MITRE ATT&CK
+- TIBER-EU
+- OST Map
+
+Select an adversary, identify TTPs of the chosen adversary, and map them to a known cyber kill chain
+
+### The TIBER-EU Framework
+
+Threat Intelligence-based Ethical Red Teaming (TIBER), developed by the European Central Bank
+
+![TIBER-EU](./pictures/tiber-eu.png)
+
+Links:
+
+- [TIBER-EU white paper](https://www.ecb.europa.eu/pub/pdf/other/ecb.tiber_eu_framework.en.pdf)
+- [CREST description](https://www.crest-approved.org/membership/tiber-eu/)
+
+### TTP Mapping
+
+
